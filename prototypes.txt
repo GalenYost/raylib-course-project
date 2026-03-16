@@ -1,0 +1,13 @@
+6
+Black Circle
+CIRCLE // OBJECT:[ (635;207);(635;207);{7:6:7};{7:6:7};0;1;Black Circle ] DATA:[ 50;50;0;0;[];0 ]
+Circle
+CIRCLE // OBJECT:[ (0;0);(0;0);{230:41:55};{230:41:55};0;1;Circle ] DATA:[ 10;10;0;0;[];0 ]
+Polygon
+POLYGON // OBJECT:[ (0;0);(0;0);{230:41:55};{230:41:55};0;1;Polygon ] DATA:[ 5;10;10;0;1;0;0;[];0 ]
+Polygon1
+POLYGON // OBJECT:[ (690;491);(690;491);{100:154:224};{100:154:224};0;1;Polygon1 ] DATA:[ 5;19;19;0;3;0;0;[];1 ]
+Rectangle
+RECTANGLE // OBJECT:[ (0;0);(0;0);{230:41:55};{230:41:55};0;1;Rectangle ] DATA:[ 10:10;10:10;0;0;[];0 ]
+Triangle
+TRIANGLE // OBJECT:[ (0;0);(0;0);{230:41:55};{230:41:55};0;1;Triangle ] DATA:[ 12;12;0;0;[];0 ]

@@ -1,0 +1,5 @@
+app**
+build/
+.ccls-cache/
+lib/*
+.cache/

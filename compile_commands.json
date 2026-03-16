@@ -1,0 +1,162 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/main.o",
+      "main.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/main.cpp",
+    "output": "/home/user/works/cpp-lab4/build/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/scene.o",
+      "scene.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/scene.cpp",
+    "output": "/home/user/works/cpp-lab4/build/scene.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/vec.o",
+      "vec.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/vec.cpp",
+    "output": "/home/user/works/cpp-lab4/build/vec.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/rect.o",
+      "./objects/rect.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/objects/rect.cpp",
+    "output": "/home/user/works/cpp-lab4/build/rect.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/polygon.o",
+      "./objects/polygon.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/objects/polygon.cpp",
+    "output": "/home/user/works/cpp-lab4/build/polygon.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/triangle.o",
+      "./objects/triangle.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/objects/triangle.cpp",
+    "output": "/home/user/works/cpp-lab4/build/triangle.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/circle.o",
+      "./objects/circle.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/objects/circle.cpp",
+    "output": "/home/user/works/cpp-lab4/build/circle.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/group.o",
+      "./objects/group.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/objects/group.cpp",
+    "output": "/home/user/works/cpp-lab4/build/group.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/registry.o",
+      "registry.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/registry.cpp",
+    "output": "/home/user/works/cpp-lab4/build/registry.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-Iobjects",
+      "-I.",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "build/object.o",
+      "object.cpp"
+    ],
+    "directory": "/home/user/works/cpp-lab4",
+    "file": "/home/user/works/cpp-lab4/object.cpp",
+    "output": "/home/user/works/cpp-lab4/build/object.o"
+  }
+]
