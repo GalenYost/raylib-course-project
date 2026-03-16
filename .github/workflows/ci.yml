@@ -1,33 +1,48 @@
-stages:
-  - build
+name: build
 
-build_linux:
-  image: archlinux:latest
-  stage: build
-  before_script:
-    - pacman -Sy --noconfirm base-devel tar make clang raylib
-    - pacman -S --noconfirm --needed mesa libx11 libxrandr libxi libxcursor libxinerama
-  script:
-    - make -B
-  artifacts:
-    name: "linux-build"
-    paths:
-      - app
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
-build_windows:
-  image: archlinux:latest
-  stage: build
-  before_script:
-    - pacman -Sy --noconfirm base-devel mingw-w64-gcc curl unzip make
-    - curl -LO https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_win64_mingw-w64.zip
-    - unzip raylib-5.5_win64_mingw-w64.zip 
-    - mkdir -p lib
-    - cp raylib-5.5_win64_mingw-w64/lib/raylib.dll ./lib/raylib.dll
-    - rm -rf raylib-5.5_win64_mingw-w64
-  script:
-    - TARGET=windows make -B
-  artifacts:
-    name: "windows-build"
-    paths:
-      - "*.exe"
-      - lib/raylib.dll
+jobs:
+  build_linux:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install deps
+        run: |
+          pacman -Sy --noconfirm base-devel tar make clang raylib \
+          mesa libx11 libxrandr libxi libxcursor libxinerama
+      - name: build
+        run: make -B
+      - name: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: app
+
+  build_windows:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install deps
+        run: |
+          pacman -Sy --noconfirm base-devel mingw-w64-gcc curl unzip make
+          curl -LO https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_win64_mingw-w64.zip
+          unzip raylib-5.5_win64_mingw-w64.zip 
+          mkdir -p lib
+          cp raylib-5.5_win64_mingw-w64/lib/raylib.dll ./lib/raylib.dll
+          rm -rf raylib-5.5_win64_mingw-w64
+      - name: build
+        run: TARGET=windows make -B
+      - name: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: |
+            *.exe
+            lib/raylib.dll
