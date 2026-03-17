@@ -10,7 +10,7 @@ TARGET ?= linux
 EXE ?= app
 
 ifeq ($(OS),Windows_NT)
-	LINKS := -lopengl32 -lgdi32 -lwinmm -L./lib
+	LINKS := -lopengl32 -lgdi32 -lwinmm -static -static-libgcc -static-libstdc++
 	EXE := app.exe
 else
 	ifeq ($(TARGET),windows)
