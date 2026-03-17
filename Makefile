@@ -15,7 +15,7 @@ ifeq ($(OS),Windows_NT)
 else
 	ifeq ($(TARGET),windows)
 		CXX := x86_64-w64-mingw32-g++
-        LINKS += -lopengl32 -lgdi32 -lwinmm -L./lib
+        LINKS += -lopengl32 -lgdi32 -lwinmm -L.
 		EXE := app.exe
 	else
 		UNAME_S := $(shell uname -s)
