@@ -35,7 +35,7 @@ jobs:
           curl -LO https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_win64_mingw-w64.zip
           unzip raylib-5.5_win64_mingw-w64.zip 
           mkdir -p lib
-          cp raylib-5.5_win64_mingw-w64/lib/raylib.dll ./lib/raylib.dll
+          cp raylib-5.5_win64_mingw-w64/lib/raylib.dll ./raylib.dll
           rm -rf raylib-5.5_win64_mingw-w64
       - name: build
         run: TARGET=windows make -B
@@ -45,4 +45,4 @@ jobs:
           name: windows-build
           path: |
             *.exe
-            lib/raylib.dll
+            raylib.dll
