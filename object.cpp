@@ -1,11 +1,13 @@
-#include "raylib.h"
-#include <registry.h>
-#include <object.h>
 #include <cstring>
 #include <cstdio>
-#include <scene.h>
 
-#include <raygui.h>
+#include <object.h>
+
+#include <utils/scene.h>
+#include <utils/registry.h>
+
+#include <include/raylib.h>
+#include <include/raygui.h>
 
 static const Vector2 defaultPos = Vector2 { 0, 0 };
 static const Color defaultColor = RED;
@@ -118,7 +120,6 @@ Object *Object::drawEditUI(float startX, float startY) {
         const std::string name = nameDialogInput;
         saved->setName(name);
 
-        static int regCount = 1;
         ObjectRegistry::getInstance()->getMap()[name] = saved;
     }
 
@@ -195,7 +196,7 @@ void Object::deserialize(std::istream &is) {
     char d; // tmp
     int r,g,b;
 
-    for (int i = 0; i < strlen(OBJECT_PREFIX); i++) is >> d;
+    for (size_t i = 0; i < strlen(OBJECT_PREFIX); i++) is >> d;
     is >> d >> d;
     is >> d >> position.x >> d >> position.y >> d >> d;
     is >> d >> originalPosition.x >> d >> originalPosition.y >> d >> d;

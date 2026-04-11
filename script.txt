@@ -1,0 +1,10 @@
+hello = true
+hello2 = "hello, world!"
+
+print hello
+print hello2
+print "hello, world! x2"
+
+fn update() {
+    set_color(0.0, 0.0, 0.0, 255.0)
+}

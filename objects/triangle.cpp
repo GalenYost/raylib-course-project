@@ -1,12 +1,13 @@
 #include <cstdio>
-#include <object.h>
-#include <triangle.h>
-#include <group.h>
-
 #include <cmath>
 #include <cstring>
-#include <raymath.h>
-#include <raygui.h>
+
+#include <object.h>
+#include <objects/triangle.h>
+#include <objects/group.h>
+
+#include <include/raymath.h>
+#include <include/raygui.h>
 
 static const float defaultSize = 12.0f;
 static const int defaultTrailValue = 0;

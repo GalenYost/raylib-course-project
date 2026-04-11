@@ -1,13 +1,14 @@
-#include <object.h>
 #include <cstdio>
-#include <rect.h>
-#include <group.h>
-
 #include <cstring>
-#include <iostream>
-#include <raymath.h>
-#include <raygui.h>
 #include <cmath>
+#include <iostream>
+
+#include <object.h>
+#include <objects/rect.h>
+#include <objects/group.h>
+
+#include <include/raymath.h>
+#include <include/raygui.h>
 
 static const float defaultWidth = 10.0f;
 static const float defaultHeight = 10.0f;

@@ -4,23 +4,24 @@ FILE_EXT := cpp
 BUILD_DIR := build
 
 CXX := clang++
-FLAGS := -O3 -Iobjects -I. -Iinclude
+CXXFLAGS := -O3 -I. -g -fsanitize=address
+LDFLAGS := -fsanitize=address
 LINKS := -lraylib
 TARGET ?= linux
 EXE ?= app
 
 ifeq ($(OS),Windows_NT)
-	LINKS := -lopengl32 -lgdi32 -lwinmm -static -static-libgcc -static-libstdc++
+	LDFLAGS += -lopengl32 -lgdi32 -lwinmm -static -static-libgcc -static-libstdc++
 	EXE := app.exe
 else
 	ifeq ($(TARGET),windows)
 		CXX := x86_64-w64-mingw32-g++
-        LINKS += -lopengl32 -lgdi32 -lwinmm -L.
+        LDFLAGS += -lopengl32 -lgdi32 -lwinmm -L.
 		EXE := app.exe
 	else
 		UNAME_S := $(shell uname -s)
 		ifeq ($(UNAME_S),Linux)
-			LINKS += -lGL -lm -lpthread -ldl -lrt -lX11
+			LDFLAGS += -lGL -lm -lpthread -ldl -lrt -lX11
 		endif
 		EXE := app
 	endif
@@ -33,10 +34,10 @@ VPATH := $(sort $(dir $(SRCS)))
 all: build $(EXE)
 
 $(EXE): $(OBJS)
-	$(CXX) $(OBJS) -o $@ $(LINKS)
+	$(CXX) $(OBJS) -o $@ $(LDFLAGS) $(LINKS)
 
 $(BUILD_DIR)/%.o: %.$(FILE_EXT) | build
-	$(CXX) $(FLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 build:
 	@mkdir -p $(BUILD_DIR)

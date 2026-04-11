@@ -1,8 +1,15 @@
 #pragma once
 
+#include <memory>
 #include <object.h>
-#include <vec.h>
-#include <registry.h>
+
+#include <utils/vec.h>
+#include <utils/registry.h>
+#include <utils/lexer.h>
+
+#include <core/context.h>
+#include <core/ast.h>
+#include <core/statements.h>
 
 #include <exception>
 
@@ -24,12 +31,10 @@ enum class AppMode {
 };
 
 class ObjectNotSupported : public std::exception {
-    private:
-        ObjectType type;
-
     public:
-        ObjectNotSupported(ObjectType type);
-        const char *what() const noexcept override;
+        const char *what() const noexcept override {
+            return "Object not supported for manual creation";
+        }
 };
 
 class Scene {
@@ -60,6 +65,9 @@ class Scene {
         void drawToolsMenu();
         Scene();
 
+        Context env;
+        Vector<std::unique_ptr<Statement>> script_ast;
+
     public:
         Scene(const Scene&) = delete;
         void operator=(const Scene&) = delete;
@@ -88,4 +96,6 @@ class Scene {
 
         friend std::istream &operator>>(std::istream &is, Scene &s);
         friend std::ostream &operator<<(std::ostream &os, const Scene &s);
+
+        void executeScript(const std::string &path);
 };

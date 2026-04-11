@@ -1,7 +1,7 @@
-#include <circle.h>
-#include <group.h>
-#include <raymath.h>
-#include <raygui.h>
+#include <objects/circle.h>
+#include <objects/group.h>
+#include <include/raymath.h>
+#include <include/raygui.h>
 #include <cstring>
 
 static const float defaultRadius = 10.0f;

@@ -3,160 +3,224 @@
     "arguments": [
       "/usr/bin/clang++",
       "-O3",
-      "-Iobjects",
       "-I.",
-      "-Iinclude",
-      "-c",
-      "-o",
-      "build/main.o",
-      "main.cpp"
-    ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/main.cpp",
-    "output": "/home/user/works/cpp-lab4/build/main.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/clang++",
-      "-O3",
-      "-Iobjects",
-      "-I.",
-      "-Iinclude",
-      "-c",
-      "-o",
-      "build/scene.o",
-      "scene.cpp"
-    ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/scene.cpp",
-    "output": "/home/user/works/cpp-lab4/build/scene.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/clang++",
-      "-O3",
-      "-Iobjects",
-      "-I.",
-      "-Iinclude",
+      "-Wall",
+      "-Wextra",
       "-c",
       "-o",
       "build/vec.o",
-      "vec.cpp"
+      "./utils/vec.cpp"
     ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/vec.cpp",
-    "output": "/home/user/works/cpp-lab4/build/vec.o"
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/utils/vec.cpp",
+    "output": "/home/user/works/raylib-course-project/build/vec.o"
   },
   {
     "arguments": [
       "/usr/bin/clang++",
       "-O3",
-      "-Iobjects",
       "-I.",
-      "-Iinclude",
+      "-Wall",
+      "-Wextra",
       "-c",
       "-o",
-      "build/rect.o",
-      "./objects/rect.cpp"
+      "build/scene.o",
+      "./utils/scene.cpp"
     ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/objects/rect.cpp",
-    "output": "/home/user/works/cpp-lab4/build/rect.o"
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/utils/scene.cpp",
+    "output": "/home/user/works/raylib-course-project/build/scene.o"
   },
   {
     "arguments": [
       "/usr/bin/clang++",
       "-O3",
-      "-Iobjects",
       "-I.",
-      "-Iinclude",
-      "-c",
-      "-o",
-      "build/polygon.o",
-      "./objects/polygon.cpp"
-    ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/objects/polygon.cpp",
-    "output": "/home/user/works/cpp-lab4/build/polygon.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/clang++",
-      "-O3",
-      "-Iobjects",
-      "-I.",
-      "-Iinclude",
+      "-Wall",
+      "-Wextra",
       "-c",
       "-o",
       "build/triangle.o",
       "./objects/triangle.cpp"
     ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/objects/triangle.cpp",
-    "output": "/home/user/works/cpp-lab4/build/triangle.o"
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/objects/triangle.cpp",
+    "output": "/home/user/works/raylib-course-project/build/triangle.o"
   },
   {
     "arguments": [
       "/usr/bin/clang++",
       "-O3",
-      "-Iobjects",
       "-I.",
-      "-Iinclude",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-o",
+      "build/polygon.o",
+      "./objects/polygon.cpp"
+    ],
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/objects/polygon.cpp",
+    "output": "/home/user/works/raylib-course-project/build/polygon.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-I.",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-o",
+      "build/main.o",
+      "main.cpp"
+    ],
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/main.cpp",
+    "output": "/home/user/works/raylib-course-project/build/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-I.",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-o",
+      "build/lexer.o",
+      "./utils/lexer.cpp"
+    ],
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/utils/lexer.cpp",
+    "output": "/home/user/works/raylib-course-project/build/lexer.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-I.",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-o",
+      "build/rect.o",
+      "./objects/rect.cpp"
+    ],
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/objects/rect.cpp",
+    "output": "/home/user/works/raylib-course-project/build/rect.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-I.",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-o",
+      "build/registry.o",
+      "./utils/registry.cpp"
+    ],
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/utils/registry.cpp",
+    "output": "/home/user/works/raylib-course-project/build/registry.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-I.",
+      "-Wall",
+      "-Wextra",
       "-c",
       "-o",
       "build/circle.o",
       "./objects/circle.cpp"
     ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/objects/circle.cpp",
-    "output": "/home/user/works/cpp-lab4/build/circle.o"
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/objects/circle.cpp",
+    "output": "/home/user/works/raylib-course-project/build/circle.o"
   },
   {
     "arguments": [
       "/usr/bin/clang++",
       "-O3",
-      "-Iobjects",
       "-I.",
-      "-Iinclude",
+      "-Wall",
+      "-Wextra",
       "-c",
       "-o",
       "build/group.o",
       "./objects/group.cpp"
     ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/objects/group.cpp",
-    "output": "/home/user/works/cpp-lab4/build/group.o"
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/objects/group.cpp",
+    "output": "/home/user/works/raylib-course-project/build/group.o"
   },
   {
     "arguments": [
       "/usr/bin/clang++",
       "-O3",
-      "-Iobjects",
       "-I.",
-      "-Iinclude",
-      "-c",
-      "-o",
-      "build/registry.o",
-      "registry.cpp"
-    ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/registry.cpp",
-    "output": "/home/user/works/cpp-lab4/build/registry.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/clang++",
-      "-O3",
-      "-Iobjects",
-      "-I.",
-      "-Iinclude",
+      "-Wall",
+      "-Wextra",
       "-c",
       "-o",
       "build/object.o",
       "object.cpp"
     ],
-    "directory": "/home/user/works/cpp-lab4",
-    "file": "/home/user/works/cpp-lab4/object.cpp",
-    "output": "/home/user/works/cpp-lab4/build/object.o"
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/object.cpp",
+    "output": "/home/user/works/raylib-course-project/build/object.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-I.",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-o",
+      "build/context.o",
+      "./core/context.cpp"
+    ],
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/core/context.cpp",
+    "output": "/home/user/works/raylib-course-project/build/context.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-I.",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-o",
+      "build/statements.o",
+      "./core/statements.cpp"
+    ],
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/core/statements.cpp",
+    "output": "/home/user/works/raylib-course-project/build/statements.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-O3",
+      "-I.",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "-o",
+      "build/ast.o",
+      "./core/ast.cpp"
+    ],
+    "directory": "/home/user/works/raylib-course-project",
+    "file": "/home/user/works/raylib-course-project/core/ast.cpp",
+    "output": "/home/user/works/raylib-course-project/build/ast.o"
   }
 ]

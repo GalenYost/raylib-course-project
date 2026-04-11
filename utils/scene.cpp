@@ -1,5 +1,6 @@
-#include <registry.h>
-#include <scene.h>
+#include <utils/registry.h>
+#include <utils/scene.h>
+#include <utils/parser.h>
 
 #include <objects/circle.h>
 #include <objects/group.h>
@@ -7,13 +8,15 @@
 #include <objects/rect.h>
 #include <objects/triangle.h>
 
-#include <raylib.h>
+#include <include/raylib.h>
+
 #include <limits>
 #include <sstream>
 #include <fstream>
+#include <variant>
 
 #define RAYGUI_IMPLEMENTATION
-#include <raygui.h>
+#include <include/raygui.h>
 
 #define FILE_DIALOG_WINDOW_WIDTH 300
 #define FILE_DIALOG_WINDOW_HEIGHT 150
@@ -28,12 +31,6 @@ static const int lineSpacing = 20;
 static const int margin = 5;
 static const int startY = 0;
 static Font font;
-
-ObjectNotSupported::ObjectNotSupported(ObjectType type) : type(type) {}
-
-const char *ObjectNotSupported::what() const noexcept {
-    return "Object not supported for manual creation";
-}
 
 Scene *Scene::instance = nullptr;
 ObjectRegistry *Scene::registry = ObjectRegistry::getInstance();
@@ -56,7 +53,7 @@ Scene *Scene::getInstance() {
 }
 
 Scene::~Scene() {
-    for (int i = 0; i < objects.len(); i++) {
+    for (unsigned i = 0; i < objects.len(); i++) {
         delete objects[i];
     }
 }
@@ -85,7 +82,7 @@ void Scene::handleInput() {
 
     if (IsKeyPressed(KEY_SPACE)) togglePause();
     if (IsKeyPressed(KEY_L)) {
-        for (int i = 0; i < objects.len() ; i++) {
+        for (unsigned i = 0; i < objects.len() ; i++) {
             if (!objects[i]->isVisible()) objects[i]->setVisible(true);
         }
     }
@@ -104,18 +101,18 @@ void Scene::handleInput() {
         }
 
         if (selectedCount < 2 && itemsToGroup.len() > 0) {
-            for (int i = 0; i < itemsToGroup.len(); i++) objects.push(itemsToGroup[i]);
+            for (unsigned i = 0; i < itemsToGroup.len(); i++) objects.push(itemsToGroup[i]);
         } else if (selectedCount > 0) {
             Group *masterGroup = new Group();
 
-            for (int i = 0; i < itemsToGroup.len(); i++) {
+            for (unsigned i = 0; i < itemsToGroup.len(); i++) {
                 Object *obj = itemsToGroup[i];
                 Group *subGroup = dynamic_cast<Group *>(obj);
 
                 if (subGroup != nullptr) {
                     Vector<Object *> &kids = subGroup->getMembers();
 
-                    for (int k = 0; k < kids.len(); k++) {
+                    for (unsigned k = 0; k < kids.len(); k++) {
                         kids[k]->setSelected(false);
                         masterGroup->addChild(kids[k]);
                     }
@@ -153,7 +150,7 @@ void Scene::handleInput() {
 
         switch (tool) {
             case AppMode::SELECT: {
-                for (int i = 0; i < objects.len(); i++) {
+                for (unsigned i = 0; i < objects.len(); i++) {
                     if (!objects[i]->contains(mousePos)) continue;
                     objects[i]->setSelected(!objects[i]->isSelected());
                     return;
@@ -162,7 +159,7 @@ void Scene::handleInput() {
             }
             case AppMode::EDIT: {
                 if (drawEditDialog) break;
-                for (int i = 0; i < objects.len(); i++) {
+                for (unsigned i = 0; i < objects.len(); i++) {
                     if (editUIObject != nullptr) return;
                     if (!objects[i]->contains(mousePos)) continue;
                     drawEditDialog = true;
@@ -193,7 +190,7 @@ void Scene::handleInput() {
         if (IsKeyDown(KEY_D)) manualDelta.x += 2;
 
         if (manualDelta.x != 0 || manualDelta.y != 0) {
-            for (int i = 0; i < objects.len(); i++) {
+            for (unsigned i = 0; i < objects.len(); i++) {
                 if (objects[i]->isSelected()) objects[i]->moveManual(manualDelta);
             }
         }
@@ -204,7 +201,7 @@ void Scene::handleInput() {
         if (IsKeyPressed(KEY_C)) setAppMode(AppMode::CREATE);
         if (IsKeyPressed(KEY_E)) setAppMode(AppMode::EDIT);
         if (IsKeyPressed(KEY_D)) {
-            for (int i = 0; i < objects.len(); i++) {
+            for (unsigned i = 0; i < objects.len(); i++) {
                 if (objects[i]->isSelected()) objects.push(objects[i]->clone());
             }
         }
@@ -223,9 +220,14 @@ void Scene::handleInput() {
 }
 
 void Scene::update() {
-    for (int i = 0; i < objects.len(); i++) {
+    if (env.find("update")) {
+        Vector<Value> args;
+        env.call("update", args);
+    }
+
+    for (unsigned i = 0; i < objects.len(); i++) {
         objects[i]->update();
-        for (int j = 0; j < objects.len(); j++) {
+        for (unsigned j = 0; j < objects.len(); j++) {
             if (i == j) continue;
             if (objects[i]->checkCollision(objects[j])) {
                 objects[i]->deform();
@@ -341,7 +343,7 @@ void Scene::drawObjectRegistryUI() {
     Rectangle contentBounds = { 0, 0, panelBounds.width - 15, map.size() * REGISTRY_ROW_HEIGHT };
     
     static Vector2 scroll = { 0, 0 };
-    Rectangle view = { 0 };
+    Rectangle view = {0, 0, 0, 0};
 
     GuiScrollPanel(panelBounds, nullptr, contentBounds, &scroll, &view);
 
@@ -396,13 +398,13 @@ void Scene::draw() {
         "Space - Toggle Auto-Movement",
     };
 
-    for (int i = 0; i < (sizeof(lines) / sizeof(lines[0])); i++) {
+    for (unsigned i = 0; i < (sizeof(lines) / sizeof(lines[0])); i++) {
         DrawTextEx(font, lines[i], Vector2{startX, startY + lineSpacing * (i+1)}, fontSize, fontSpacing, BLACK);
     }
 
     drawToolsMenu();
 
-    for (int i = 0; i < objects.len(); i++) {
+    for (unsigned i = 0; i < objects.len(); i++) {
         objects[i]->draw();
     }
 
@@ -451,7 +453,7 @@ void Scene::createObject(ObjectType type, Vector2 pos, Color c, float param1, fl
             obj = new Polygon(pos, int(param2), param1, c);
             break;
         default:
-            throw ObjectNotSupported(type);
+            throw ObjectNotSupported();
     }
 
     if (!obj) return;
@@ -518,11 +520,61 @@ std::istream &operator>>(std::istream &is, Scene &s) {
 }
 std::ostream &operator<<(std::ostream &os, const Scene &s) {
     os << s.objects.len() << std::endl;
-    for (int i = 0; i < s.objects.len(); i++) {
+    for (unsigned i = 0; i < s.objects.len(); i++) {
         Object *obj = s.objects[i];
         if (obj == nullptr) continue;
         os << *obj;
         os << std::endl;
     }
     return os;
+}
+
+void Scene::executeScript(const std::string &path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Couldnt read script with path '" << path << "'" << std::endl;
+        return;
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string src = buffer.str();
+
+    Lexer lex(src);
+    Vector<Token> tokens = lex.tokenize();
+
+    Parser parser(tokens);
+    script_ast = parser.parse_all();
+
+    std::cout << "Loaded '" << path << "'" << std::endl;
+
+    env.bind("set_color", [this](Vector<Value> &args) -> Value {
+        if (args.len() < 4) {
+            std::cerr << "[ERROR]: not enough args provided" << "\n";
+            std::cerr << "USAGE: set_color_for_selected(r, g, b, a), where r/g/b/a are of type 'Number'" << "\n";
+            return std::monostate {};
+        }
+
+        if (std::holds_alternative<float>(args[0]) && 
+            std::holds_alternative<float>(args[1]) && 
+            std::holds_alternative<float>(args[2]) &&
+            std::holds_alternative<float>(args[3])
+        ) {
+            unsigned char r = (unsigned char)std::get<float>(args[0]);
+            unsigned char g = (unsigned char)std::get<float>(args[1]);
+            unsigned char b = (unsigned char)std::get<float>(args[2]);
+            unsigned char a = (unsigned char)std::get<float>(args[3]);
+            Color c = Color { .r = r, .g = g, .b = b, .a = a };
+
+            for (unsigned i = 0; i < this->objects.len(); i++) {
+                objects[i]->setColor(c);
+            }
+        }
+
+        return std::monostate {};
+    });
+
+    for (unsigned i = 0; i < script_ast.len(); i++) {
+        script_ast[i]->execute(env);
+    }
 }

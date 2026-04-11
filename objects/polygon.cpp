@@ -1,10 +1,12 @@
-#include <object.h>
-#include <polygon.h>
 #include <cmath>
 #include <cstring>
-#include <raymath.h>
-#include <raygui.h>
-#include <group.h>
+
+#include <include/raygui.h>
+#include <include/raymath.h>
+
+#include <object.h>
+#include <objects/group.h>
+#include <objects/polygon.h>
 
 static const int defaultSides = 5;
 static const float defaultRadius = 10.0f;

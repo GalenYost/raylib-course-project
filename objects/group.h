@@ -1,5 +1,5 @@
 #include <object.h>
-#include <vec.h>
+#include <utils/vec.h>
 
 class Group : public Object {
     private:

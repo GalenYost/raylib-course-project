@@ -1,14 +1,14 @@
-#include <registry.h>
-#include <raygui.h>
+#include <utils/registry.h>
+#include <include/raygui.h>
 
 #include <limits>
 #include <sstream>
 
-#include <circle.h>
-#include <polygon.h>
-#include <rect.h>
-#include <triangle.h>
-#include <group.h>
+#include <objects/circle.h>
+#include <objects/polygon.h>
+#include <objects/rect.h>
+#include <objects/triangle.h>
+#include <objects/group.h>
 
 ObjectRegistry *ObjectRegistry::instance = nullptr;
 ObjectRegistry::ObjectRegistry() = default;

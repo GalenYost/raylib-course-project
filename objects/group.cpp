@@ -1,13 +1,15 @@
-#include "raylib.h"
-#include "scene.h"
+#include <include/raylib.h>
+#include <include/raygui.h>
+
 #include <object.h>
-#include <group.h>
-#include <circle.h>
-#include <polygon.h>
-#include <rect.h>
-#include <triangle.h>
-#include <raygui.h>
-#include <registry.h>
+#include <objects/group.h>
+#include <objects/circle.h>
+#include <objects/polygon.h>
+#include <objects/rect.h>
+#include <objects/triangle.h>
+
+#include <utils/registry.h>
+#include <utils/scene.h>
 
 #include <cstring>
 #include <limits>
@@ -18,7 +20,7 @@ Group::Group() : Object({0, 0}, WHITE) {
     baseName = "Group";
 }
 Group::~Group() {
-    for (int i = 0; i < children.len(); i++) { delete children[i]; }
+    for (unsigned i = 0; i < children.len(); i++) { delete children[i]; }
 }
 
 Vector<Object *> Group::disband() {
@@ -37,7 +39,7 @@ void Group::addChild(Object *obj) {
 Object *Group::clone() {
     Group *newGroup = new Group();
 
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         newGroup->addChild(children[i]->clone());
     }
 
@@ -53,7 +55,7 @@ void Group::update() {
     float sumX = 0;
     float sumY = 0;
 
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         children[i]->update();
 
         Vector2 childPos = children[i]->getPos();
@@ -68,7 +70,7 @@ void Group::update() {
 void Group::draw() {
     if (!visible) return;
 
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         bool wasSelected = children[i]->isSelected();
         if (this->selected) children[i]->setSelected(false);
 
@@ -79,7 +81,7 @@ void Group::draw() {
 
     if (selected && children.len() > 1) {
         Vector2 center = getPos();
-        for (int i = 0; i < children.len(); i++) {
+        for (unsigned i = 0; i < children.len(); i++) {
             DrawLineV(center, children[i]->getPos(), Fade(GREEN, 0.5f));
         }
         DrawCircleV(center, 4, GREEN);
@@ -88,7 +90,7 @@ void Group::draw() {
 
 bool Group::contains(Vector2 point) {
     if (!visible) return false;
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         if (children[i]->contains(point)) return true;
     }
     return false;
@@ -97,31 +99,31 @@ bool Group::contains(Vector2 point) {
 float Group::getRadius() { return 30.0f; }
 
 void Group::moveManual(Vector2 delta) {
-    for (int i = 0; i < children.len(); i++) children[i]->moveManual(delta);
+    for (unsigned i = 0; i < children.len(); i++) children[i]->moveManual(delta);
 }
 
 void Group::randomizeColor() {
-    for (int i = 0; i < children.len(); i++) children[i]->randomizeColor();
+    for (unsigned i = 0; i < children.len(); i++) children[i]->randomizeColor();
 }
 
 void Group::toggleTrail() {
-    for (int i = 0; i < children.len(); i++) children[i]->toggleTrail();
+    for (unsigned i = 0; i < children.len(); i++) children[i]->toggleTrail();
 }
 
 void Group::deform() {
-    for (int i = 0; i < children.len(); i++) children[i]->deform();
+    for (unsigned i = 0; i < children.len(); i++) children[i]->deform();
 }
 
 void Group::reset() {
     Object::reset();
-    for (int i = 0; i < children.len(); i++) children[i]->reset();
+    for (unsigned i = 0; i < children.len(); i++) children[i]->reset();
 }
 
 Vector2 Group::getPos() const {
     if (children.len() == 0) return {0, 0};
 
     float sumX = 0, sumY = 0;
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         Vector2 p = children[i]->getPos();
         sumX += p.x;
         sumY += p.y;
@@ -132,7 +134,7 @@ Vector2 Group::getPos() const {
 bool Group::checkCollision(Object *other) {
     if (!visible) return false;
 
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         if (children[i]->checkCollision(other)) { return true; }
     }
     return false;
@@ -140,14 +142,14 @@ bool Group::checkCollision(Object *other) {
 
 void Group::setVisible(bool visible) {
     this->visible = visible;
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         children[i]->setVisible(visible);
     }
 }
 
 void Group::setColor(Color c) {
     this->editUIColor = c;
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         children[i]->setColor(c);
     }
 }
@@ -200,7 +202,7 @@ Object *Group::drawEditUI(float startX, float startY) {
     cursorY += ROW_SPACING*2;
 
     std::string listItems = "";
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         listItems += children[i]->getName();
         if (i < children.len() - 1) {
             listItems += ";";
@@ -211,7 +213,7 @@ Object *Group::drawEditUI(float startX, float startY) {
     cursorY += ROW_SPACING;
 
     GuiListView({ startX, cursorY, LABEL_TITLE_WIDTH*1.5, LIST_HEIGHT }, listItems.c_str(), &scrollIndex, &activeItem);
-    if (activeItem >= 0 && activeItem < children.len()) {
+    if (activeItem >= 0 && activeItem < (int)children.len()) {
         Object* selectedChild = children[activeItem];
         activeItem = -1;
         return selectedChild;
@@ -235,7 +237,7 @@ void Group::serialize(std::ostream &os) const {
         isSelected() << " " << TYPE_SEP << " " <<
         isVisible() << " " << TYPE_SEP << " " <<
         getName() << std::endl;
-    for (int i = 0; i < children.len(); i++) {
+    for (unsigned i = 0; i < children.len(); i++) {
         os << *children[i];
         os << std::endl;
     }
