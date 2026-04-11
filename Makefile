@@ -4,8 +4,8 @@ FILE_EXT := cpp
 BUILD_DIR := build
 
 CXX := clang++
-CXXFLAGS := -O3 -I. -g -fsanitize=address
-LDFLAGS := -fsanitize=address
+CXXFLAGS := -O3 -I.
+LDFLAGS =
 LINKS := -lraylib
 TARGET ?= linux
 EXE ?= app
@@ -21,7 +21,8 @@ else
 	else
 		UNAME_S := $(shell uname -s)
 		ifeq ($(UNAME_S),Linux)
-			LDFLAGS += -lGL -lm -lpthread -ldl -lrt -lX11
+			LDFLAGS += -lGL -lm -lpthread -ldl -lrt -lX11 -fsanitize=address
+			CXXFLAGS += -g -fsanitize=address
 		endif
 		EXE := app
 	endif
