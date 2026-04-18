@@ -37,7 +37,6 @@ Vector<Token> Lexer::tokenize() {
 
         if (isdigit(c)) {
             std::string num;
-            num += c;
 
             while (isdigit(peek())) num += move();
 
@@ -67,6 +66,10 @@ Vector<Token> Lexer::tokenize() {
                 tokens.push(Token(TokenType::NONE, ident, line, pos - ident.length()));
             } else if (ident == "fn") {
                 tokens.push(Token(TokenType::FN_KEYWORD, ident, line, pos - ident.length()));
+            } else if (ident == "if") {
+                tokens.push(Token(TokenType::IF, ident, line, pos - ident.length()));
+            } else if (ident == "else") {
+                tokens.push(Token(TokenType::ELSE, ident, line, pos - ident.length()));
             } else {
                 tokens.push(Token(TokenType::IDENTIFIER, ident, line, pos - ident.length()));
             }
@@ -86,7 +89,13 @@ Vector<Token> Lexer::tokenize() {
             tokens.push(Token(TokenType::DIVIDE, std::string(1, move()), line, pos));
             continue;
         } else if (c == '=') {
-            tokens.push(Token(TokenType::EQUALS, std::string(1, move()), line, pos));
+            move();
+            if (peek() == '=') {
+                move();
+                tokens.push(Token(TokenType::EQ_EQ, "==", line, pos));
+            } else {
+                tokens.push(Token(TokenType::EQUALS, "=", line, pos));
+            }
             continue;
         } else if (c == '{') {
             tokens.push(Token(TokenType::LBRACE, std::string(1, move()), line, pos));
@@ -102,6 +111,24 @@ Vector<Token> Lexer::tokenize() {
             continue;
         } else if (c == ',') {
             tokens.push(Token(TokenType::COMMA, std::string(1, move()), line, pos));
+            continue;
+        } else if (c == '>') {
+            move();
+            if (peek() == '=') {
+                move();
+                tokens.push(Token(TokenType::MORE_EQ, ">=", line, pos));
+            } else {
+                tokens.push(Token(TokenType::MORE, ">", line, pos));
+            }
+            continue;
+        } else if (c == '<') {
+            move();
+            if (peek() == '=') {
+                move();
+                tokens.push(Token(TokenType::LESS_EQ, "<=", line, pos));
+            } else {
+                tokens.push(Token(TokenType::LESS, "<", line, pos));
+            }
             continue;
         } else if (c == '"') {
             move();

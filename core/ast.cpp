@@ -74,17 +74,46 @@ static Value exec_div(const Value& lval, const Value& rval) {
     throw std::runtime_error("Type mismatch in addition.");
 }
 
-Value BinOp::evaluate(Context &context) const {
-    Value lval = left->evaluate(context);
-    Value rval = right->evaluate(context);
+Value BinOp::evaluate(Context& context) const {
+    Value left_val = left->evaluate(context);
+    Value right_val = right->evaluate(context);
 
-    switch (type) {
-        case TokenType::PLUS: return exec_add(lval, rval);
-        case TokenType::MINUS: return exec_sub(lval, rval);
-        case TokenType::MULTIPLY: return exec_mult(lval, rval);
-        case TokenType::DIVIDE: return exec_div(lval, rval);
-        default: throw new std::runtime_error("Unknown operation");
+    auto get_num = [](const Value& v) -> float {
+        if (std::holds_alternative<int>(v)) return (float)std::get<int>(v);
+        return std::get<float>(v);
     };
+
+    bool left_is_num = std::holds_alternative<int>(left_val) || std::holds_alternative<float>(left_val);
+    bool right_is_num = std::holds_alternative<int>(right_val) || std::holds_alternative<float>(right_val);
+
+    if (left_is_num && right_is_num) {
+        float l = get_num(left_val);
+        float r = get_num(right_val);
+
+        switch (type) {
+            case TokenType::PLUS: return l + r;
+            case TokenType::MINUS: return l - r;
+            case TokenType::MULTIPLY: return l * r;
+            case TokenType::DIVIDE: return l / r;
+            case TokenType::MORE: return l > r;
+            case TokenType::MORE_EQ: return l >= r;
+            case TokenType::LESS: return l < r;
+            case TokenType::LESS_EQ: return l <= r;
+            case TokenType::EQ_EQ: return l == r;
+            default: break;
+        }
+    }
+
+    if (type == TokenType::EQ_EQ) {
+        if (std::holds_alternative<std::string>(left_val) && std::holds_alternative<std::string>(right_val)) {
+            return std::get<std::string>(left_val) == std::get<std::string>(right_val);
+        }
+        if (std::holds_alternative<bool>(left_val) && std::holds_alternative<bool>(right_val)) {
+            return std::get<bool>(left_val) == std::get<bool>(right_val);
+        }
+    }
+
+    throw std::runtime_error("Invalid operands for binary operation");
 }
 
 Call::Call(std::string n, Vector<std::unique_ptr<Expression>> a) : name(n), args(std::move(a)) {}

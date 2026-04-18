@@ -15,8 +15,6 @@ class WhileLoop : public Statement {
         std::unique_ptr<Expression> condition;
         std::unique_ptr<Statement> body;
 
-        bool is_truthy(const Value &val) const;
-
     public:
         explicit WhileLoop(std::unique_ptr<Expression> cond, std::unique_ptr<Statement> b);
         void execute(Context &context) override;
@@ -68,5 +66,17 @@ class FunctionDeclaration : public Statement {
         std::unique_ptr<Block> body;
 
         FunctionDeclaration(std::string n, Vector<std::string> params, std::unique_ptr<Block> b);
+        void execute(Context &context) override;
+};
+
+class IfElse : public Statement {
+    private:
+        std::unique_ptr<Expression> condition;
+
+    public:
+        std::unique_ptr<Block> if_body;
+        std::unique_ptr<Block> else_body;
+
+        IfElse(std::unique_ptr<Expression> e, std::unique_ptr<Block> if_b, std::unique_ptr<Block> else_b);
         void execute(Context &context) override;
 };

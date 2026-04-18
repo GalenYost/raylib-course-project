@@ -3,7 +3,7 @@
 #include <variant>
 #include <iostream>
 
-bool WhileLoop::is_truthy(const Value &val) const {
+static bool is_truthy(const Value &val) {
     if (std::holds_alternative<bool>(val)) return std::get<bool>(val);
     if (std::holds_alternative<int>(val)) return std::get<int>(val) > 0;
     return false;
@@ -61,4 +61,17 @@ FunctionDeclaration::FunctionDeclaration(std::string n, Vector<std::string> p, s
 
 void FunctionDeclaration::execute(Context &context) {
     context.define_fn(this->name, this);
+}
+
+IfElse::IfElse(std::unique_ptr<Expression> e, std::unique_ptr<Block> if_b, std::unique_ptr<Block> else_b) :
+    condition(std::move(e)), if_body(std::move(if_b)), else_body(std::move(else_b)) {}
+
+void IfElse::execute(Context &context) {
+    Value cond_val = condition->evaluate(context);
+
+    if (is_truthy(cond_val)) {
+        if_body->execute(context);
+    } else {
+        if (else_body) else_body->execute(context);
+    }
 }

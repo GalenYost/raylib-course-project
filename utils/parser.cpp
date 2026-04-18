@@ -114,23 +114,41 @@ std::unique_ptr<Statement> Parser::parse_statement() {
         return std::make_unique<Block>(std::move(stmts));
     }
 
+    if (match(TokenType::IF)) {
+        std::unique_ptr<Expression> cond = parse_expression();
+
+        consume(TokenType::LBRACE, "Expected '{' after if condition");
+        
+        Vector<std::unique_ptr<Statement>> if_stmts;
+        while (peek().type != TokenType::RBRACE && peek().type != TokenType::TOKEN_EOF) {
+            if_stmts.push(parse_statement());
+        }
+        
+        consume(TokenType::RBRACE, "Expected '}' after if block");
+
+        std::unique_ptr<Block> if_body = std::make_unique<Block>(std::move(if_stmts));
+        std::unique_ptr<Block> else_body = nullptr;
+        
+        if (match(TokenType::ELSE)) {
+            consume(TokenType::LBRACE, "Expected '{' after else");
+            
+            Vector<std::unique_ptr<Statement>> else_stmts;
+            while (peek().type != TokenType::RBRACE && peek().type != TokenType::TOKEN_EOF) {
+                else_stmts.push(parse_statement());
+            }
+            
+            consume(TokenType::RBRACE, "Expected '}' after else block");
+            else_body = std::make_unique<Block>(std::move(else_stmts));
+        }
+
+        return std::make_unique<IfElse>(std::move(cond), std::move(if_body), std::move(else_body));
+    }
+
     throw std::runtime_error("Unknown statement");
 }
 
 std::unique_ptr<Expression> Parser::parse_expression() {
-    std::unique_ptr<Expression> expr = parse_primary();
-
-    while (match(TokenType::PLUS) ||
-           match(TokenType::MINUS) ||
-           match(TokenType::MULTIPLY) ||
-           match(TokenType::DIVIDE)
-    ) {
-        Token op = prev();
-        std::unique_ptr<Expression> right = parse_primary();
-        expr = std::make_unique<BinOp>(std::move(expr), op.type, std::move(right));
-    }
-
-    return expr;
+    return parse_equality();
 }
 
 std::unique_ptr<Expression> Parser::parse_primary() {
@@ -153,6 +171,55 @@ std::unique_ptr<Expression> Parser::parse_primary() {
     }
 
     throw std::runtime_error("Syntax Error: Expected an expression.");
+}
+
+std::unique_ptr<Expression> Parser::parse_equality() {
+    std::unique_ptr<Expression> expr = parse_comparison();
+
+    while (match(TokenType::EQ_EQ)) {
+        Token op = prev();
+        std::unique_ptr<Expression> right = parse_comparison();
+        expr = std::make_unique<BinOp>(std::move(expr), op.type, std::move(right));
+    }
+
+    return expr;
+}
+
+std::unique_ptr<Expression> Parser::parse_comparison() {
+    std::unique_ptr<Expression> expr = parse_term();
+
+    while (match(TokenType::MORE) || match(TokenType::MORE_EQ) ||
+           match(TokenType::LESS) || match(TokenType::LESS_EQ)) {
+        Token op = prev();
+        std::unique_ptr<Expression> right = parse_term();
+        expr = std::make_unique<BinOp>(std::move(expr), op.type, std::move(right));
+    }
+
+    return expr;
+}
+
+std::unique_ptr<Expression> Parser::parse_term() {
+    std::unique_ptr<Expression> expr = parse_factor();
+
+    while (match(TokenType::PLUS) || match(TokenType::MINUS)) {
+        Token op = prev();
+        std::unique_ptr<Expression> right = parse_factor();
+        expr = std::make_unique<BinOp>(std::move(expr), op.type, std::move(right));
+    }
+
+    return expr;
+}
+
+std::unique_ptr<Expression> Parser::parse_factor() {
+    std::unique_ptr<Expression> expr = parse_primary();
+
+    while (match(TokenType::MULTIPLY) || match(TokenType::DIVIDE)) {
+        Token op = prev();
+        std::unique_ptr<Expression> right = parse_primary();
+        expr = std::make_unique<BinOp>(std::move(expr), op.type, std::move(right));
+    }
+
+    return expr;
 }
 
 Parser::Parser(Vector<Token> t) : tokens(std::move(t)) {}

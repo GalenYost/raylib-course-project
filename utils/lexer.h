@@ -1,21 +1,31 @@
 #pragma once
 
-#include <cstring>
 #include <string>
 #include <utils/vec.h>
 
 enum class TokenType {
+    // types
     NUMBER, FLOAT,
     TRUE, FALSE,
     STRING_LIT, NONE,
-    EQUALS,
+
+    // keywords
     IDENTIFIER, FN_KEYWORD,
+    WHILE, PRINT, IF, ELSE,
+
+    // operations
     PLUS, MINUS,
+    EQUALS,
     MULTIPLY, DIVIDE,
-    WHILE, PRINT,
+
+    // specials
     LBRACE, RBRACE,
     LPAREN, RPAREN,
     COMMA,
+    MORE, LESS,
+    MORE_EQ, LESS_EQ,
+    EQ_EQ,
+
     TOKEN_EOF,
     ERROR
 };

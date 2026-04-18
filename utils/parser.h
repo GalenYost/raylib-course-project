@@ -19,6 +19,10 @@ class Parser {
         std::unique_ptr<Statement> parse_statement();
         std::unique_ptr<Expression> parse_expression();
         std::unique_ptr<Expression> parse_primary();
+        std::unique_ptr<Expression> parse_factor();
+        std::unique_ptr<Expression> parse_term();
+        std::unique_ptr<Expression> parse_comparison();
+        std::unique_ptr<Expression> parse_equality();
 
     public:
         explicit Parser(Vector<Token> t);
