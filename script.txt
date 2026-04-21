@@ -1,28 +1,11 @@
-r = 0.0
-g = 0.0
-b = 0.0
-factor = 1.0
-
-fn check() {
-    if r >= 255.0 {
-        r = 0.0
-    }
-    if g >= 255.0 {
-        g = 0.0
-    }
-    if b >= 255.0 {
-        b = 0.0
-    }
-}
-
-fn increment() {
-    r = r + 1.0 * factor
-    g = g + 1.0 * factor
-    b = b + 1.0 * factor
-}
+current = 0
+factor = 1
 
 fn update() {
-    check()
-    set_color(r, g, b, 255.0)
-    increment()
+    if current == 60 {
+        randomize_color()
+        current = 0
+    } else {
+        current = current + factor
+    }
 }

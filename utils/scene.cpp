@@ -1,3 +1,4 @@
+#include <memory>
 #include <utils/registry.h>
 #include <utils/scene.h>
 #include <utils/parser.h>
@@ -20,6 +21,9 @@
 
 #define FILE_DIALOG_WINDOW_WIDTH 300
 #define FILE_DIALOG_WINDOW_HEIGHT 150
+
+#define SCRIPT_DIALOG_WINDOW_WIDTH 300
+#define SCRIPT_DIALOG_WINDOW_HEIGHT 150
 
 #define REGISTRY_WINDOW_WIDTH 250.0f
 #define REGISTRY_WINDOW_HEIGHT 300.0f
@@ -78,7 +82,8 @@ void Scene::run() {
 }
 
 void Scene::handleInput() {
-    if (tool == AppMode::DIALOG) return;
+    if (tool == AppMode::FILE_DIALOG ||
+        tool == AppMode::SCRIPT_DIALOG) return;
 
     if (IsKeyPressed(KEY_SPACE)) togglePause();
     if (IsKeyPressed(KEY_L)) {
@@ -215,14 +220,19 @@ void Scene::handleInput() {
         }
     }
 
+    if (IsKeyPressed(KEY_F9)) setAppMode(AppMode::SCRIPT_DIALOG);
     if (IsKeyPressed(KEY_F10)) triggerSave();
     if (IsKeyPressed(KEY_F11)) triggerLoad();
 }
 
 void Scene::update() {
-    if (env.find("update")) {
-        Vector<Value> args;
-        env.call("update", args);
+    for (auto &pair : scripts) {
+        Script *script = pair.second.get();
+
+        if (script->active && script->env.find("update")) {
+            Vector<Value> args;
+            script->env.call("update", args);
+        }
     }
 
     for (unsigned i = 0; i < objects.len(); i++) {
@@ -243,6 +253,7 @@ void Scene::drawToolsMenu() {
         "CTRL+E - Edit Mode",
         "CTRL+D - Clone Object",
         "CTRL+X - Delete Object",
+        "F9 - Execute script",
         "F10 - Save State",
         "F11 - Load State",
     };
@@ -281,7 +292,7 @@ void Scene::drawFileDialogUI() {
     float cursorY = startY + ROW_SPACING + SECTION_PADDING;
     float contentWidth = FILE_DIALOG_WINDOW_WIDTH - (SECTION_PADDING * 4.0f);
 
-    GuiLabel({ cursorX, cursorY, LABEL_TITLE_WIDTH, ELEMENT_HEIGHT }, "Filename:");
+    GuiLabel({ cursorX, cursorY, LABEL_TITLE_WIDTH, ELEMENT_HEIGHT }, "Filename");
     cursorY += ELEMENT_HEIGHT + INNER_PADDING;
 
     if (GuiTextBox({ cursorX, cursorY, contentWidth, ELEMENT_HEIGHT * 1.5f }, fileDialogInput, INPUT_BUFFER_SIZE, fileDialogEditMode)) {
@@ -409,6 +420,7 @@ void Scene::draw() {
     }
 
     if (drawFileDialog) drawFileDialogUI();
+    if (drawScriptDialog) drawScriptDialogUI();
     if (drawEditDialog && editUIObject != nullptr) {
         float sw = (float)GetScreenWidth();
         float sh = (float)GetScreenHeight();
@@ -466,8 +478,11 @@ void Scene::setAppMode(AppMode tool) {
     if (tool == AppMode::CREATE) drawObjectRegistryList = true;
     else drawObjectRegistryList = false;
 
-    if (tool == AppMode::DIALOG) drawFileDialog = true;
+    if (tool == AppMode::FILE_DIALOG) drawFileDialog = true;
     else drawFileDialog = false;
+
+    if (tool == AppMode::SCRIPT_DIALOG) drawScriptDialog = true;
+    else drawScriptDialog = false;
 
     lastUsedMode = this->tool;
     this->tool = tool;
@@ -475,12 +490,12 @@ void Scene::setAppMode(AppMode tool) {
 
 void Scene::triggerSave() {
     fileDialogType = true;
-    setAppMode(AppMode::DIALOG);
+    setAppMode(AppMode::FILE_DIALOG);
 }
 
 void Scene::triggerLoad() {
     fileDialogType = false;
-    setAppMode(AppMode::DIALOG);
+    setAppMode(AppMode::FILE_DIALOG);
 }
 
 std::istream &operator>>(std::istream &is, Scene &s) {
@@ -529,7 +544,7 @@ std::ostream &operator<<(std::ostream &os, const Scene &s) {
     return os;
 }
 
-void Scene::executeScript(const std::string &path) {
+void Scene::loadScript(const std::string &path) {
     std::ifstream file(path);
     if (!file.is_open()) {
         std::cerr << "Couldnt read script with path '" << path << "'" << std::endl;
@@ -544,11 +559,13 @@ void Scene::executeScript(const std::string &path) {
     Vector<Token> tokens = lex.tokenize();
 
     Parser parser(tokens);
-    script_ast = parser.parse_all();
+
+    std::unique_ptr<Script> script = std::make_unique<Script>();
+    script->ast = parser.parse_all();
 
     std::cout << "Loaded '" << path << "'" << std::endl;
 
-    env.bind("set_color", [this](Vector<Value> &args) -> Value {
+    script->env.bind("set_color", [this](Vector<Value> &args) -> Value {
         if (args.len() < 4) {
             std::cerr << "[ERROR]: not enough args provided" << "\n";
             std::cerr << "USAGE: set_color_for_selected(r, g, b, a), where r/g/b/a are of type 'Number'" << "\n";
@@ -573,8 +590,54 @@ void Scene::executeScript(const std::string &path) {
 
         return std::monostate {};
     });
+    script->env.bind("randomize_color", [this](Vector<Value> &args) -> Value {
+        (void)args;
+        for (unsigned i = 0; i < this->objects.len(); i++) {
+            objects[i]->randomizeColor();
+        }
+        return std::monostate {};
+    });
 
-    for (unsigned i = 0; i < script_ast.len(); i++) {
-        script_ast[i]->execute(env);
+    for (unsigned i = 0; i < script->ast.len(); i++) {
+        script->ast[i]->execute(script->env);
+    }
+
+    scripts[path] = std::move(script);
+}
+
+void Scene::drawScriptDialogUI() {
+    float startX = (GetScreenWidth() - SCRIPT_DIALOG_WINDOW_WIDTH) / 2.0f;
+    float startY = (GetScreenHeight() - SCRIPT_DIALOG_WINDOW_HEIGHT) / 2.0f;
+
+    const char *title = "Execute script";
+
+    if (GuiWindowBox({ startX, startY, SCRIPT_DIALOG_WINDOW_WIDTH, FILE_DIALOG_WINDOW_HEIGHT }, title)) {
+        setAppMode(lastUsedMode);
+        return;
+    }
+
+    float cursorX = startX + SECTION_PADDING * 2.0f;
+    float cursorY = startY + ROW_SPACING + SECTION_PADDING;
+    float contentWidth = SCRIPT_DIALOG_WINDOW_WIDTH - (SECTION_PADDING * 4.0f);
+
+    GuiLabel({ cursorX, cursorY, LABEL_TITLE_WIDTH, ELEMENT_HEIGHT }, "File path");
+    cursorY += ELEMENT_HEIGHT + INNER_PADDING;
+
+    if (GuiTextBox({ cursorX, cursorY, contentWidth, ELEMENT_HEIGHT * 1.5f }, scriptDialogInput, INPUT_BUFFER_SIZE, scriptDialogEditMode)) {
+        scriptDialogEditMode = !scriptDialogEditMode;
+    }
+    cursorY += ELEMENT_HEIGHT + (SECTION_PADDING*2) + INNER_PADDING;
+
+    float btnWidth = (contentWidth - SECTION_PADDING) / 2.0f;
+
+    if (GuiButton({ cursorX, cursorY, btnWidth, ELEMENT_HEIGHT * 1.5f }, title)) {
+        loadScript(scriptDialogInput);
+        setAppMode(lastUsedMode);
+    }
+
+    cursorX += btnWidth + SECTION_PADDING;
+
+    if (GuiButton({ cursorX, cursorY, btnWidth, ELEMENT_HEIGHT * 1.5f }, "Cancel")) {
+        setAppMode(lastUsedMode);
     }
 }

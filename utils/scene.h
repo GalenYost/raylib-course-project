@@ -26,7 +26,8 @@
 enum class AppMode {
     SELECT,
     CREATE,
-    DIALOG,
+    FILE_DIALOG,
+    SCRIPT_DIALOG,
     EDIT,
 };
 
@@ -35,6 +36,12 @@ class ObjectNotSupported : public std::exception {
         const char *what() const noexcept override {
             return "Object not supported for manual creation";
         }
+};
+
+struct Script {
+    Vector<std::unique_ptr<Statement>> ast;
+    Context env;
+    bool active = true;
 };
 
 class Scene {
@@ -63,10 +70,16 @@ class Scene {
         void drawObjectRegistryUI();
 
         void drawToolsMenu();
+
+        // script execution dialog
+        bool drawScriptDialog = false;
+        bool scriptDialogEditMode = false;
+        char scriptDialogInput[INPUT_BUFFER_SIZE] = ""; // remember last input
+        void drawScriptDialogUI();
+
         Scene();
 
-        Context env;
-        Vector<std::unique_ptr<Statement>> script_ast;
+        std::unordered_map<std::string, std::unique_ptr<Script>> scripts;
 
     public:
         Scene(const Scene&) = delete;
@@ -97,5 +110,5 @@ class Scene {
         friend std::istream &operator>>(std::istream &is, Scene &s);
         friend std::ostream &operator<<(std::ostream &os, const Scene &s);
 
-        void executeScript(const std::string &path);
+        void loadScript(const std::string &path);
 };
