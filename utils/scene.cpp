@@ -705,10 +705,16 @@ void Scene::startThreads() {
                 Object* obj = objects[i];
                 
                 if (obj->target == nullptr || obj->target->markedForDeletion) {
-                    for (unsigned j = 0; j < objects.len(); j++) {
-                        if (i != j && !objects[j]->markedForDeletion) {
-                            obj->target = objects[j];
-                            break;
+                    if (objects.len() > 1) {
+                        int startIdx = GetRandomValue(0, objects.len() - 1);
+
+                        for (unsigned j = 0; j < objects.len(); j++) {
+                            unsigned checkIdx = (startIdx + j) % objects.len();
+
+                            if (i != checkIdx && !objects[checkIdx]->markedForDeletion) {
+                                obj->target = objects[checkIdx];
+                                break;
+                            }
                         }
                     }
                 }
@@ -725,17 +731,17 @@ void Scene::startThreads() {
                 Object* obj = objects[i];
                 
                 if (obj->target && !obj->markedForDeletion && !obj->target->markedForDeletion) {
-                    if (obj->checkCollision(obj->target)) {
+                    float dx = obj->target->getPos().x - obj->getPos().x;
+                    float dy = obj->target->getPos().y - obj->getPos().y;
+                    float dist = std::sqrt(dx*dx + dy*dy);
+                    
+                    float collisionDist = (obj->getRadius() + obj->target->getRadius()) * 0.8f;
+
+                    if (dist < collisionDist) {
                         obj->markedForDeletion = true;
                         obj->target->markedForDeletion = true;
-                    } else {
-                        float dx = obj->target->getPos().x - obj->getPos().x;
-                        float dy = obj->target->getPos().y - obj->getPos().y;
-                        float length = std::sqrt(dx*dx + dy*dy);
-
-                        if (length > 0) {
-                            obj->moveManual({ (dx / length) * 2.0f, (dy / length) * 2.0f });
-                        }
+                    } else if (dist > 0) {
+                        obj->moveManual({ (dx / dist) * 2.0f, (dy / dist) * 2.0f });
                     }
                 }
             }
