@@ -1,6 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <thread>
+#include <mutex>
+#include <atomic>
+
 #include <object.h>
 
 #include <utils/vec.h>
@@ -79,7 +83,13 @@ class Scene {
 
         Scene();
 
+        // scripts container
         std::unordered_map<std::string, std::unique_ptr<Script>> scripts;
+
+        // multi-threading
+        std::mutex objects_mutex;
+        std::atomic<bool> threads_run { false };
+        std::thread t_spawner, t_targeter, t_mover, t_reaper;
 
     public:
         Scene(const Scene&) = delete;
@@ -111,4 +121,7 @@ class Scene {
         friend std::ostream &operator<<(std::ostream &os, const Scene &s);
 
         void loadScript(const std::string &path);
+
+        void startThreads();
+        void stopThreads();
 };

@@ -87,6 +87,9 @@ class Object {
         virtual void deserialize(std::istream &is);
 
     public:
+        Object *target = nullptr;
+        bool markedForDeletion = false;
+
         Object(Vector2 pos, Color c);
         Object();
         virtual ~Object();

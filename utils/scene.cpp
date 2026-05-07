@@ -1,4 +1,9 @@
+#include <chrono>
 #include <memory>
+#include <cmath>
+
+#include <mutex>
+#include <thread>
 #include <utils/registry.h>
 #include <utils/scene.h>
 #include <utils/parser.h>
@@ -57,6 +62,7 @@ Scene *Scene::getInstance() {
 }
 
 Scene::~Scene() {
+    stopThreads();
     for (unsigned i = 0; i < objects.len(); i++) {
         delete objects[i];
     }
@@ -70,6 +76,8 @@ void Scene::init() {
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
     GuiSetFont(font);
     GuiSetStyle(DEFAULT, TEXT_SIZE, fontSize);
+
+    startThreads();
 }
 
 void Scene::run() {
@@ -226,6 +234,8 @@ void Scene::handleInput() {
 }
 
 void Scene::update() {
+    std::lock_guard<std::mutex> lock(objects_mutex);
+
     for (auto &pair : scripts) {
         Script *script = pair.second.get();
 
@@ -388,6 +398,8 @@ void Scene::drawObjectRegistryUI() {
 
 #define DRAW_FPS false
 void Scene::draw() {
+    std::lock_guard<std::mutex> lock(objects_mutex);
+
     BeginDrawing();
     ClearBackground(RAYWHITE);
 
@@ -640,4 +652,124 @@ void Scene::drawScriptDialogUI() {
     if (GuiButton({ cursorX, cursorY, btnWidth, ELEMENT_HEIGHT * 1.5f }, "Cancel")) {
         setAppMode(lastUsedMode);
     }
+}
+
+void Scene::startThreads() {
+    threads_run = true;
+
+    t_spawner = std::thread([this]() {
+        while (threads_run) {
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::lock_guard<std::mutex> lock(objects_mutex);
+
+            if (objects.len() < 10) {
+                Vector2 pos = {
+                    (float)(GetRandomValue(50, WIDTH - 50)),
+                    (float)(GetRandomValue(50, HEIGHT - 50)),
+                };
+                Color col = {
+                    (unsigned char)GetRandomValue(50, 255), 
+                    (unsigned char)GetRandomValue(50, 255), 
+                    (unsigned char)GetRandomValue(50, 255), 255
+                };
+
+                Object *newObj = nullptr;
+                int type = GetRandomValue(0, 3);
+
+                switch (type) {
+                    case 0: // Circle
+                        newObj = new Circle(pos, (float)GetRandomValue(10, 30), col);
+                        break;
+                    case 1: // Rect
+                        newObj = new Rect(pos, (float)GetRandomValue(20, 50), (float)GetRandomValue(20, 50), col);
+                        break;
+                    case 2: // Triangle
+                        newObj = new Triangle(pos, (float)GetRandomValue(20, 40), col);
+                        break;
+                    case 3: // Polygon
+                        newObj = new Polygon(pos, GetRandomValue(5, 8), (float)GetRandomValue(15, 35), col);
+                        break;
+                }
+
+                if (newObj) objects.push(newObj);
+            }
+        }
+    });
+
+    t_targeter = std::thread([this]() {
+        while (threads_run) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::lock_guard<std::mutex> lock(objects_mutex);
+
+            for (unsigned i = 0; i < objects.len(); i++) {
+                Object* obj = objects[i];
+                
+                if (obj->target == nullptr || obj->target->markedForDeletion) {
+                    for (unsigned j = 0; j < objects.len(); j++) {
+                        if (i != j && !objects[j]->markedForDeletion) {
+                            obj->target = objects[j];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    t_mover = std::thread([this]() {
+        while (threads_run) {
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::lock_guard<std::mutex> lock(objects_mutex);
+
+            for (unsigned i = 0; i < objects.len(); i++) {
+                Object* obj = objects[i];
+                
+                if (obj->target && !obj->markedForDeletion && !obj->target->markedForDeletion) {
+                    if (obj->checkCollision(obj->target)) {
+                        obj->markedForDeletion = true;
+                        obj->target->markedForDeletion = true;
+                    } else {
+                        float dx = obj->target->getPos().x - obj->getPos().x;
+                        float dy = obj->target->getPos().y - obj->getPos().y;
+                        float length = std::sqrt(dx*dx + dy*dy);
+
+                        if (length > 0) {
+                            obj->moveManual({ (dx / length) * 2.0f, (dy / length) * 2.0f });
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    t_reaper = std::thread([this]() {
+        while (threads_run) {
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::lock_guard<std::mutex> lock(objects_mutex);
+
+            for (int i = objects.len() - 1; i >= 0; i--) {
+                if (objects[i]->markedForDeletion) {
+                    Object* toDelete = objects[i];
+
+                    for (unsigned j = 0; j < objects.len(); j++) {
+                        if (objects[j]->target == toDelete) {
+                            objects[j]->target = nullptr;
+                        }
+                    }
+
+                    objects.remove(i);
+                    delete toDelete; 
+                }
+            }
+        }
+    });
+}
+
+void Scene::stopThreads() {
+    threads_run = false;
+
+    if (t_spawner.joinable()) t_spawner.join();
+    if (t_targeter.joinable()) t_targeter.join();
+    if (t_mover.joinable()) t_mover.join();
+    if (t_reaper.joinable()) t_reaper.join();
 }
