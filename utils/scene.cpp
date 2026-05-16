@@ -397,8 +397,9 @@ void Scene::drawObjectRegistryUI() {
 }
 
 #define DRAW_FPS false
+
 void Scene::draw() {
-    std::lock_guard<std::mutex> lock(objects_mutex);
+    // std::lock_guard<std::mutex> lock(objects_mutex);
 
     BeginDrawing();
     ClearBackground(RAYWHITE);
@@ -654,12 +655,17 @@ void Scene::drawScriptDialogUI() {
     }
 }
 
+#define T_SPAWNER_SLEEP_MS 500
+#define T_TARGETER_SLEEP_MS 2000
+#define T_MOVER_SLEEP_MS 10
+#define T_REAPER_SLEEP_MS 10
+
 void Scene::startThreads() {
     threads_run = true;
 
     t_spawner = std::thread([this]() {
         while (threads_run) {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::this_thread::sleep_for(std::chrono::milliseconds(T_SPAWNER_SLEEP_MS));
             std::lock_guard<std::mutex> lock(objects_mutex);
 
             if (objects.len() < 10) {
@@ -698,7 +704,7 @@ void Scene::startThreads() {
 
     t_targeter = std::thread([this]() {
         while (threads_run) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(T_TARGETER_SLEEP_MS));
             std::lock_guard<std::mutex> lock(objects_mutex);
 
             for (unsigned i = 0; i < objects.len(); i++) {
@@ -724,7 +730,7 @@ void Scene::startThreads() {
 
     t_mover = std::thread([this]() {
         while (threads_run) {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::this_thread::sleep_for(std::chrono::milliseconds(T_MOVER_SLEEP_MS));
             std::lock_guard<std::mutex> lock(objects_mutex);
 
             for (unsigned i = 0; i < objects.len(); i++) {
@@ -750,7 +756,7 @@ void Scene::startThreads() {
 
     t_reaper = std::thread([this]() {
         while (threads_run) {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::this_thread::sleep_for(std::chrono::milliseconds(T_REAPER_SLEEP_MS));
             std::lock_guard<std::mutex> lock(objects_mutex);
 
             for (int i = objects.len() - 1; i >= 0; i--) {
