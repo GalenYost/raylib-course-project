@@ -399,8 +399,6 @@ void Scene::drawObjectRegistryUI() {
 #define DRAW_FPS false
 
 void Scene::draw() {
-    // std::lock_guard<std::mutex> lock(objects_mutex);
-
     BeginDrawing();
     ClearBackground(RAYWHITE);
 
@@ -655,10 +653,10 @@ void Scene::drawScriptDialogUI() {
     }
 }
 
-#define T_SPAWNER_SLEEP_MS 500
-#define T_TARGETER_SLEEP_MS 2000
+#define T_SPAWNER_SLEEP_MS 1
+#define T_TARGETER_SLEEP_MS 1
 #define T_MOVER_SLEEP_MS 10
-#define T_REAPER_SLEEP_MS 10
+#define T_REAPER_SLEEP_MS 1
 
 void Scene::startThreads() {
     threads_run = true;
@@ -697,6 +695,7 @@ void Scene::startThreads() {
                         break;
                 }
 
+                newObj->setVelocity(Vector2 {0, 0});
                 if (newObj) objects.push(newObj);
             }
         }
